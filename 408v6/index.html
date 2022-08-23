@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Automata Tool</title>
+    <script src="treeBuilder.js"></script>
+    <script src="graphics.js"></script>
+    <link rel="stylesheet" href="indexStyle.css">
+</head>
+
+<body>
+    <main>
+        <div id="title">
+            <p>Automata Tool</p>
+        </div>
+        <div id="instructions">
+            <strong>Instructions</strong>
+            <button type="button" onclick="toggleInfo()" id="instructionToggle">+</button>
+            <div id="instructionsContent" style="display:none">
+                <ul>
+                    <li>Regular Expression:  Type into this text box the regular expression that you would like to build a tree from and then press the 'Parse' button.</li>
+                    <li>Test String:  Once you have either parsed a regular expression or created one yourself on the canvas, type a string into this text box and press the 'Test' button to see if the automaton accepts or rejects it.</li>
+                    <li>Edit (button):  This allows you to modify the generated automaton or create one manually.  Also displays the operations available to perform on the automaton.</li>
+                    <li>Add (button):  This adds a node to the canvas.  Click and drag a node to move it.  Clickin on one of the grey squares once sets the starting node for a line and clicking on a second grey square (can be same one) sets the end node for a line, doing so will prompt you to type in a character for the transition.  Double clicking either a line or node deletes it.</li>
+                    <li>Clear (button):  Resets the canvas for drawing.</li>
+                    <li>Build (button):  Clicking this will build a regular expression using the automaton presented on the canvas, it will display this generated regular expression at the bottom of the page.</li>
+                    <li>Powerset Construct (button):  Clicking this button will take the automaton on the canvas and apply powerset construction onto it and hence will <strong>determinise</strong> it. </li>
+                    <li>Brzozowski's (button):  Clicking this will apply Brzozowski's Algorithm to the automaton on the canvas and hence will <strong>minimise</strong> it.</li>
+                </ul>
+            </div>
+        </div>
+        <div id="inputRegExpDiv" class="inputDiv">
+            <label for="regExp">Regular Expression:</label>
+            <input type="text" id="regExp" class="inputInput">
+            <button type="button" onclick="parse()">Parse</button>
+        </div>
+        <div id="inputTestStringDiv" class="inputDiv">
+            <label for="testString">Test String:</label>
+            <input type="text" id="testString" class="inputInput">
+            <button type="button" onclick="test()">Test</button>
+        </div>
+        <div id="canvasButtons">
+            <button type="button" id="editButton" onclick="prepCanvas()">Edit</button>
+            <div id="automataGraphicButtons">
+                <button type="button" id="addNode" onclick="addNode()">Add</button>
+                <button type="button" id="clearNodes" onclick="prepCanvas()">Clear</button>
+            </div>
+        </div>
+        <div id="automataCanvasDiv">
+            <svg id="automataSVG">
+                <style>
+                </style>
+                <defs id="svgMarkers">
+                    <marker id="arrowHead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" />
+                    </marker>
+                </defs>
+            </svg>
+            <div class="startNodeDiv" id="strt0">
+                <div class="startNodeToConnector" onclick="startConnect()"></div>
+                <img src="nodesImages/startNode.png" id="startNodeImage">
+                <p>0</p>
+                <select id="startSelect" onchange="changeStart()">
+                    <option selected="selected" value=0>Normal</option>
+                    <option value=1>Accept</option>
+                </select>
+            </div>
+        </div>
+        <div id="automatonOperations">
+            <button type="button" id="buildButton" onclick="buildFromCanvas()">Build</button>
+            <!--<button type="button" id="reverseButton" onclick="doReverse()">Reverse</button>-->
+            <button type="button" id="powersetButton" onclick="doPowerset_construct()">Powerset Construct</button>
+            <button type="button" id="brzozowskiButton" onclick="doBrzozowskis()">Brzozowski's</button>
+        </div>
+        <div>
+            <p id="generatedRegularExpression"></p>
+        </div>
+    </main>
+</body>
+<script>
+    function toggleInfo(){
+        switch(document.getElementById('instructionToggle').innerHTML){
+            case '+':
+                document.getElementById('instructionsContent').style.display = 'initial';
+                document.getElementById('instructionToggle').innerHTML = '-';
+                break;
+            default:
+                document.getElementById('instructionsContent').style.display = 'none';
+                document.getElementById('instructionToggle').innerHTML = '+';
+                break;
+        }
+    }
+    function parse() {
+        let input = document.getElementById('regExp').value;
+        if (input == '') {
+            alert("Please enter a regualr expression.");
+            return;
+        }
+        tree = 'null';
+        canvasTree = 'null';
+        nodeIndex = 1;
+        lineIndex = 0;
+        document.getElementById('automataCanvasDiv').innerHTML = '<svg id="automataSVG"><defs><marker id="arrowHead" markerWidth="10"' +
+            ' markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points = "0 0, 10, 3.5, 0 7" /></marker></defs></svg><div' +
+            ' class="startNodeDiv" id="strt0"' + '><div class="startNodeToConnector" onclick="startConnect()"></div><img src="nodesImages/startNode.png"' +
+            ' id="startNodeImage"><p>0</p><select id="startSelect" onchange="changeStart()"><option selected="selected" value=0>Normal</option>' +
+            '<option value=1>Accept</option></select></div>';
+        buildTree(input);
+        drawFromTree();
+    }
+    function test() {
+        let currTree;
+        if ((tree == 'null') && (canvasTree == 'null')) {
+            alert('No parsed tree to test string on.');
+            return;
+        }
+        if (tree != 'null') {
+            currTree = tree;
+        } else if (canvasTree != 'null') {
+            currTree = canvasTree;
+        }
+        let input = document.getElementById('testString').value;
+        testStringOnTree(input, currTree);
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData('text', ev.target.id);
+    }
+    function doReverse() {
+        if (tree != 'null') {
+            reverseTree(tree);
+            return;
+        } else {
+            reverseTree(canvasTree);
+            return;
+        }
+    }
+    function doBrzozowskis() {
+        let r;
+        if (tree != 'null') {
+            r = brzozowski(tree);
+        } else {
+            if(canvasTree.nodes.length == 1){
+                if(canvasTree.start.next.length == 0){
+                    alert("Please add some nodes/lines to the automaton.");
+                    return;
+                }else{
+                    if(!pathToEnd(canvasTree.start, [])){
+                        alert("Please add an end state to the automaton.");
+                        return;
+                    }
+                }
+            }
+            r = brzozowski(canvasTree);
+        }
+        tree = 'null';
+        canvasTree = 'null';
+        prepCanvas();
+        tree = r;
+        canvasTree = r;
+        drawFromTree();
+    }
+    function doPowerset_construct() {
+        let r;
+        if (tree != 'null') {
+            r = powerset_construct(tree);
+        } else {
+            if(canvasTree.nodes.length == 1){
+                if(canvasTree.start.next.length == 0){
+                    alert("Please add some nodes/lines to the automaton.");
+                    return;
+                }else{
+                    if(!pathToEnd(canvasTree.start, [])){
+                        alert("Please add an end state to the automaton.");
+                        return;
+                    }
+                }
+            }
+            r = powerset_construct(canvasTree);
+        }
+        prepCanvas();
+        tree = r;
+        canvasTree = 'null';
+        drawFromTree();
+
+    }
+</script>
+
+</html>

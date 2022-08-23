@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&display=swap');
+body{
+    font-family:'Arimo';   
+}
+label{
+    font-weight:bold;
+}
+button{
+    border:none;
+    background-color: #386af3;
+    font-family:'Arimo';
+    font-weight:bold;
+    color:white;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+.inputDiv{
+    margin: 1rem auto;
+    width:max-content;
+    height:2.5rem;
+    border-bottom: 2px solid lightgrey;
+}
+#title{
+    width:max-content;
+    margin: 0 auto;
+}
+#title p{
+    font-weight:bold;
+    font-size:1.5rem;
+}
+main{
+    margin-top: 3rem;
+    min-height:max-content;
+}
+.inputInput{
+    border: 2px solid lightgray;
+    border-radius:3px;
+}
+#automataCanvasDiv{
+    clear:right;
+    width:94%;
+    height:25rem;
+    margin: 1rem 3%;
+    position:relative;
+    border:2px solid rgba(0, 0, 0, 0.4);
+}
+#instructions{
+    margin: 0 auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    width:90%;
+}
+#instructions button{
+    font-size:1rem;
+    padding:0.125rem 0.25rem;
+}
+#automataCanvas{
+    width:100%;
+    height:25rem;
+    background: rgba(232, 232, 232, 0.7);
+}
+.nodeDiv{
+    position:absolute;
+    width:min-content;
+    z-index: 99;
+}
+#editButton{
+    float:right;
+    margin:0rem 2.8% 0.7rem 0;
+}
+#generatedRegularExpression{
+    display:none;
+    width:100%;
+    text-align:center;
+}
+#automatonOperations{
+    margin: 1rem 0 0.7rem 1rem;
+    display:none;
+}
+#automataGraphicButtons{
+    display:none;
+}
+#automataSVG{
+    height: 100%;
+    width: 100%;
+    position:absolute;
+    z-index:0;
+}
+.startNodeDiv{
+    position:absolute;
+    width:min-content;
+    margin-top:calc(12.5rem - 34px);
+    z-index: 99;
+}
+.startNodeDiv p{
+    position:absolute;
+    top:15.5%;
+    left: 54.5%;
+    margin: 0;
+    font-size:1.25rem;
+}
+.startNodeDiv select{
+    width:80%;
+    margin: 0.2rem 0 0 20%;
+    border:none;
+    font-size:0.5rem;
+    font-family: 'Arimo';
+    font-weight:bold;
+    padding:0.2rem 0.1rem;
+    border-radius: 2.5px;
+    background: #668fff;
+    color: white;
+}
+.nodeDiv select{
+    width:100%;
+    margin: 0.2rem 0 0 0;
+    border:none;
+    font-family: 'Arimo';
+    font-weight:bold;
+    font-size:0.5rem;
+    padding:0.2rem 0.1rem;
+    border-radius: 2.5px;
+    background: #668fff;
+    color: white;
+}
+.nodeDiv select option{
+    font-family: 'Arimo';
+}
+#startNodeImage{
+    width:4rem;
+    height: auto;
+}
+.startNodeToConnector{
+    position: absolute;
+    background:rgba(0, 0, 0, 0.6);
+    width:9px;
+    height:9px;
+    top:26%;
+    right:0;
+    z-index:99;
+}
+.normalNodeImage{
+    width:3rem;
+    height: auto;
+}
+.nodeDiv p{
+    position:absolute;
+    top: 15%;
+    left: 39.5%;
+    font-size:1.25rem;
+    margin: 0;
+}
+.nodeToConnector, .nodeFromConnector{
+    width:10px;
+    height:10px;
+    background: rgba(0, 0, 0, 0.6);
+    position:absolute;
+    top:25%;
+}
+.nodeFromConnector{
+}
+.nodeToConnector{
+    right: 0;
+}
